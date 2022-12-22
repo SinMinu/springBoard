@@ -54,9 +54,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter(){
-        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
-        jsonUsernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager());
-        return jsonUsernamePasswordLoginFilter();
+        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
+
+        jsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
+
+        jsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessJWTProvideHandler());
+
+        jsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());//변경
+        return jsonUsernamePasswordLoginFilter;
     }
 
     @Bean
