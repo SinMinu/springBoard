@@ -13,7 +13,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import springBoard.springBoard.domain.member.repository.MemberRepository;
 import springBoard.springBoard.domain.member.service.LoginService;
+import springBoard.springBoard.global.jwt.service.JwtService;
 import springBoard.springBoard.global.login.filter.JsonUsernamePasswordAuthenticationFilter;
 import springBoard.springBoard.global.login.handler.LoginFailureHandler;
 import springBoard.springBoard.global.login.handler.LoginSuccessJWTProvideHandler;
@@ -24,6 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ObjectMapper objectMapper;
     private final LoginService loginService;
+    private final MemberRepository memberRepository;
+    private final JwtService jwtService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
@@ -38,18 +42,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
 
         http.addFilterAfter(jsonUsernamePasswordLoginFilter(), LogoutFilter.class);
+        http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){       //1 - PasswordEncoder 등록
+    public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(){       //2 - AuthenticationManager 등록
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();       //DaoAuthenticationProvider 사용
-        provider.setPasswordEncoder(passwordEncoder());     //PasswordEncoder로는 PasswordEncoderFactories.createDelegatingPasswordEncoder() 사용
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(loginService);
+
         return new ProviderManager(provider);
+    }
+
+    @Bean
+    public LoginSuccessJWTProvideHandler loginSuccessJWTProvideHandler(){
+        return new LoginSuccessJWTProvideHandler(jwtService, memberRepository);//변경
+    }
+
+    @Bean
+    public LoginFailureHandler loginFailureHandler(){
+        return new LoginFailureHandler();
     }
 
     @Bean
@@ -65,12 +83,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public LoginSuccessJWTProvideHandler loginSuccessJWTProvideHandler(){
-        return new LoginSuccessJWTProvideHandler();
-    }
+    public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter(){
+        JwtAuthenticationProcessingFilter jsonUsernamePasswordLoginFilter = new JwtAuthenticationProcessingFilter(jwtService, memberRepository);
 
-    @Bean
-    public LoginFailureHandler loginFailureHandler(){
-        return new LoginFailureHandler();
+        return jsonUsernamePasswordLoginFilter;
     }
 }

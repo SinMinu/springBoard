@@ -33,12 +33,13 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(length = 100)
-    private String refreshToken;
+    @Column(length = 1000)
+    private String refreshToken;//RefreshToken
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
+
     public void destroyRefreshToken(){
         this.refreshToken = null;
     }

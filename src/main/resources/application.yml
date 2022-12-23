@@ -6,9 +6,6 @@ logging:
     org.apache.coyote.http11: debug #Http ???? ?? ???
 
 spring:
-  profiles:
-    include: jwt
-
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:tcp://localhost/~/jpa
@@ -33,6 +30,9 @@ spring:
     hibernate:
       ddl-auto: create
 
+  profiles:
+    include: jwt
+
   data:
     web:
       pageable:
@@ -42,8 +42,6 @@ spring:
     multipart:
       max-file-size: 2MB
       max-request-size: 5MB
-
-
 server:
   servlet:
     session:
