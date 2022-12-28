@@ -3,8 +3,14 @@ package springBoard.springBoard.domain.member;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import springBoard.springBoard.domain.BaseTimeEntity;
+import springBoard.springBoard.domain.comment.Comment;
+import springBoard.springBoard.domain.post.Post;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Table(name = "MEMBER")
 @Getter
@@ -35,6 +41,24 @@ public class Member extends BaseTimeEntity {
 
     @Column(length = 1000)
     private String refreshToken;//RefreshToken
+
+    /*
+    * 회원탈퇴 -> 작성한 게시물, 댓글 모두 삭제
+    * */
+    @OneToMany(mappedBy = "writer", cascade = ALL, orphanRemoval = true)
+    private List<Post> postList = new ArrayList<>();
+    @OneToMany(mappedBy = "writer", cascade = ALL, orphanRemoval = true)
+    private List<Comment> commentList = new ArrayList<>();
+
+    /*
+    * 연관관계 메서드
+    * */
+    public void addPost(Post post){
+        postList.add(post);
+    }
+    public void addComment(Comment comment){
+        commentList.add(comment);
+    }
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;

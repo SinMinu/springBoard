@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import springBoard.springBoard.domain.member.repository.MemberRepository;
 import springBoard.springBoard.domain.member.service.LoginService;
+import springBoard.springBoard.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import springBoard.springBoard.global.jwt.service.JwtService;
 import springBoard.springBoard.global.login.filter.JsonUsernamePasswordAuthenticationFilter;
 import springBoard.springBoard.global.login.handler.LoginFailureHandler;
